@@ -19,7 +19,24 @@ void main()
     float aspect_ratio = u_resolution.x / u_resolution.y;
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
     st.x *= aspect_ratio;
+
+    float amount = 0.0;
+    
+    amount = (1.0 + sin(u_time*6.0)) * 0.3;
+    amount *= 1.0 + sin(u_time*16.0) * 0.3;
+    amount *= 1.0 + sin(u_time*19.0) * 0.3;
+    amount *= 1.0 + sin(u_time*27.0) * 0.3;
+    amount = pow(amount, 3.0);
+
+    amount *= 0.05;
  
-    gl_FragColor.r = circle(st, 0.2, sin(u_time * 3.1415 * u_frequency) / 4.0 + 0.35);
+    float pulse = sin(u_time * 3.1415 * u_frequency) / 4.0 + 0.35;
+
+    st.y -= amount * 0.5;
+    gl_FragColor.r = circle(st, 0.2, pulse);
+    st.x += amount;
+    gl_FragColor.g = circle(st, 0.2, pulse)*0.3;
+    st.x -= 2.0 * amount;
+    gl_FragColor.b = circle(st, 0.2, pulse)*0.3;
     gl_FragColor.a = 1.0;    
 }
