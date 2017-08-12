@@ -1,7 +1,8 @@
-var glslCanvas = require('glslCanvas')
 var haversine = require('haversine-distance')
 var fs = require('fs')
 var fragShader = fs.readFileSync(__dirname + '/shader.frag', 'utf8')
+var pulseFrequency = 1
+var lastUpdate
 
 function updateBeep (beep, distance) {
 	var logDist = Math.log(Math.max(0,Math.max(0.1, distance) / 2))
@@ -10,13 +11,20 @@ function updateBeep (beep, distance) {
 
 	if (distance < 5) {
 		beep.setConstant()
-		sandbox.setUniform('u_frequency', 20)
+		pulseFrequency = 20
 	} else {
 		var frequency = 10 / Math.max(0.5, logDist)
 		beep.setBeeping()
 	    beep.setBeepFrequence(frequency)
-		sandbox.setUniform('u_frequency', frequency)
+		pulseFrequency = frequency
 	}
+
+	var now = +new Date()
+	if (lastUpdate) {
+		var dt = now -lastUpdate
+		document.querySelector('#timing').innerHTML = dt
+	}
+	lastUpdate = now
 }
 
 function createBeep() {
@@ -73,13 +81,42 @@ function createBeep() {
 
 var beep
 var target = {latitude: 57.73, longitude: 11.941}
-var canvas = document.createElement('canvas');
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
-var sandbox = new GlslCanvas(canvas);
-document.body.appendChild(canvas);
-sandbox.load(fragShader)
-sandbox.setUniform('u_frequency', 1.0)
+var dimension = [window.innerWidth, window.innerHeight]
+var canvas = document.createElement('canvas')
+canvas.width = dimension[0] / window.devicePixelRatio
+canvas.height = dimension[1] / window.devicePixelRatio
+document.body.appendChild(canvas)
+
+var regl = require('regl')(canvas)
+var drawPulse = regl({
+	frag: fragShader,
+	vert: `
+	  precision mediump float;
+	  attribute vec2 position;
+	  varying vec2 uv;
+	  void main () {
+	    uv = position;
+	    gl_Position = vec4(2.0 * position - 1.0, 0, 1);
+	  }`,
+
+	attributes: {
+	    position: [
+	      -2, 0,
+	      0, -2,
+	      2, 2]
+	},
+  	uniforms: {
+		u_resolution: [canvas.width, canvas.height],
+		u_time: function (context) { return context.time },
+		u_frequency: function () { return pulseFrequency }
+  	},
+  	count: 3
+})
+
+regl.frame(function () {
+	regl.clear({ color: [0, 0, 0, 1] })
+	drawPulse()
+})
 
 navigator.geolocation.watchPosition(function(p) {
 	var distance = haversine(p.coords, target)
@@ -87,6 +124,7 @@ navigator.geolocation.watchPosition(function(p) {
 		beep = createBeep()
 	}
 	updateBeep(beep, distance)
+	document.querySelector('#distance').innerHTML = distance.toFixed(0)
 }, function(err) {
     console.log(err);
 }, {
