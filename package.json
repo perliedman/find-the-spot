@@ -1,0 +1,23 @@
+{
+  "name": "locate-the-place",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "watchify index.js -t brfs -o bundle.js | http-server -S",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "brfs": "^1.4.3",
+    "glslCanvas": "0.0.25",
+    "haversine-distance": "^1.1.3",
+    "howler": "^2.0.4"
+  },
+  "devDependencies": {
+    "browserify": "^14.4.0",
+    "watchify": "^3.9.0"
+  }
+}
