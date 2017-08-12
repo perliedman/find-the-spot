@@ -1,24 +1,26 @@
 var haversine = require('haversine-distance')
+var runningAverage = require('./running-average')
 var fs = require('fs')
 var fragShader = fs.readFileSync(__dirname + '/shader.frag', 'utf8')
-var pulseFrequency = 1
 var lastUpdate
 
+
+var pulseFrequency = runningAverage(20)
+pulseFrequency.put(1)
 function updateBeep (beep, distance) {
 	var logDist = Math.log(Math.max(0,Math.max(0.1, distance) / 2))
 
 	var toneFrequency = Math.max(400, 4000 - Math.pow(logDist, 3) * 25)
 	beep.setToneFrequence(toneFrequency)
-	console.log(toneFrequency)
 
 	if (distance < 5) {
 		beep.setConstant()
-		pulseFrequency = 20
+		pulseFrequency.put(20)
 	} else {
 		var frequency = 10 / Math.max(0.5, logDist)
 		beep.setBeeping()
 	    beep.setBeepFrequence(frequency)
-		pulseFrequency = frequency
+		pulseFrequency.put(frequency)
 	}
 
 	var now = +new Date()
@@ -110,7 +112,7 @@ var drawPulse = regl({
   	uniforms: {
 		u_resolution: [canvas.width, canvas.height],
 		u_time: function (context) { return context.time },
-		u_frequency: function () { return pulseFrequency }
+		u_frequency: function () { return pulseFrequency.get() }
   	},
   	count: 3
 })
