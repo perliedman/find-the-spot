@@ -6,7 +6,7 @@
   "scripts": {
     "assets": "mkdir -p assets/leaflet && cp -r node_modules/leaflet/dist/* assets/leaflet",
     "start": "npm run assets && watchify index.js -t brfs -o bundle.js | http-server -S",
-    "build": "npm run assets && browserify index.js -r brfs -o bundle.js",
+    "build": "npm run assets && browserify index.js -t brfs -o bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
