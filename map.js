@@ -1,7 +1,23 @@
 var L = require('leaflet')
 var targetLocation = require('./target-location')
 
-var map = module.exports = L.map('map').setView([57.74325, 11.93227], 17)
+var map = module.exports = L.map('map')
+.setView([targetLocation.latitude, targetLocation.longitude], 17)
+
+var locationMarker;
+map.locate({
+	watch: true,
+	enableHighAccuracy: true
+})
+.on('locationfound', function (e) {
+	if (!locationMarker) {
+		locationMarker = L.circleMarker(e.latlng, {
+			radius: 5,
+		}).addTo(map)
+	} else {
+		locationMarker.setLatLng(e.latlng)
+	}
+})
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	attribution: '&copy; OpenStreetMap contributors'
