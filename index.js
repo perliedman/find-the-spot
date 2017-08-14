@@ -31,5 +31,6 @@ var onTap = function () {
 	}
 }
 
-document.body.addEventListener('click', onTap)
+document.body.addEventListener('mousedown', onTap)
+document.body.addEventListener('pointerdown', onTap)
 document.body.addEventListener('touchstart', onTap)
