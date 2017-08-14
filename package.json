@@ -1,7 +1,7 @@
 {
   "name": "find-the-spot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simplistic location based game to find to a location using simulated radio location",
   "main": "index.js",
   "scripts": {
     "assets": "mkdir -p assets/leaflet && cp -r node_modules/leaflet/dist/* assets/leaflet",
@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Per Liedman <per@liedman.net>",
   "license": "ISC",
   "dependencies": {
     "brfs": "^1.4.3",
